@@ -1,7 +1,18 @@
+import joblib
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
+# Load the saved model and vectorizer
+model = joblib.load("news_classifier.pkl")
+vectorizer = joblib.load("tfidf_vectorizer.pkl")
+
+# Initialize FastAPI app
 app = FastAPI()
+
+# Define request body format
+class NewsInput(BaseModel):
+    headline: str
 
 # Allow requests from your GitHub Pages domain
 origins = [
@@ -22,6 +33,12 @@ def home():
     return {"message": "FastAPI is running with CORS enabled!"}
 
 @app.post("/predict/")
-async def predict(data: dict):
-    headline = data.get("headline", "")
-    return {"headline": headline, "prediction": "Fake" if "fake" in headline.lower() else "Real"}
+async def predict_news(input_data: NewsInput):
+    tfidf_input = vectorizer.transform([input_data.headline])
+    prediction = model.predict(tfidf_input)[0]
+    return {"headline": input_data.headline, "prediction": "Real News" if prediction == 1 else "Fake News"}
+
+# Run the API server
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
