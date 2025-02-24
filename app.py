@@ -13,6 +13,10 @@ app = FastAPI()
 class NewsInput(BaseModel):
     headline: str
 
+@app.get("/")
+def home():
+    return {"message": "FastAPI is running!"}
+
 @app.post("/predict/")
 async def predict_news(input_data: NewsInput):
     tfidf_input = vectorizer.transform([input_data.headline])
