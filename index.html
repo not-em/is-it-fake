@@ -18,7 +18,7 @@
     <script>
         async function predictNews() {
             const headline = document.getElementById("headline").value;
-            const response = await fetch("https://your-app.onrender.com/predict/", {
+            const response = await fetch("https://is-it-fake.onrender.com/predict/", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ headline: headline })
